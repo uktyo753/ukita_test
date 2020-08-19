@@ -1,4 +1,4 @@
-//https://app.codegrid.net/entry/2017-testcafe-1#toc-1 の例
+//https://app.codegrid.net/entry/2017-testcafe-1#toc-1 の例 ver2
 
 import {Selector} from 'testcafe';
 //ページを開く
