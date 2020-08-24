@@ -1,4 +1,5 @@
-//https://app.codegrid.net/entry/2017-testcafe-1#toc-1 の例
+//https://app.codegrid.net/entry/2017-testcafe-1#toc-1 
+// testcafeの動作確認　浮田誉之
 //8/24
 
 import {Selector} from 'testcafe';
