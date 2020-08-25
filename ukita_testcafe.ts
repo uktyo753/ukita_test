@@ -14,6 +14,7 @@ test('テスト1.名前を入力後、送信して遷移先を確認', async t =
     .setNativeDialogHandler(() => true)//確認ダイアログでOKを押す
     .typeText(userName, 'うきた')//UserNameに名前を入力する
     .click(submitButton);//submitボタンをクリックする
+    
   await t.expect(Selector('#thanks-message').innerText).eql('うきた様、アンケートにお答えいただき、ありがとうございました。')
   //ボタンを押した後に想定される文章がeqlと一致 
   .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/1-thanks.html");
@@ -21,19 +22,19 @@ test('テスト1.名前を入力後、送信して遷移先を確認', async t =
 });//ここまでが1つのテスト
 
 
-test('テスト1-B.名前が未入力の場合', async t => {
+test('テスト1-B.名前が未入力の場合', async t => {//赤で「名前は必須項目です。」が表示されてるか調べたい
   const userName   = await Selector('#user-name');
   const submitButton = await Selector('#submit-button');
   await t
     .setNativeDialogHandler(() => true)
+    //('#user-name-error').innerText).eql('名前は必須項目です。')
+    //消えてるときに意味を成さない項目→テストしない
+    .expect(Selector('#user-name-error').filterVisible().exists).notOk()//まだ非表示
+    .click(submitButton)//ボタンを押す（以下、エラーメッセージが表示）
+    .expect(Selector('#user-name-error').getStyleProperty('color')).eql('rgb(255, 0, 0)')//字が赤色か
     .expect(Selector('#user-name-error').innerText).eql('名前は必須項目です。')
-    .expect(Selector('#user-name-error').exists).notOk()
-    .wait(1000)
-    .click(submitButton)//ボタンを押す（名前は未入力）
-    .expect(Selector('#user-name-error').innerText).eql('名前は必須項目です。')
-    .expect(Selector('#user-name-error').exists).ok()
-    .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/");
-    //赤文字で「名前は必須項目です。」が表示されてるか調べたい
+    .expect(Selector('#user-name-error').filterVisible().exists).ok();//メッセージ非表示
+    
 });
 
 
@@ -43,7 +44,10 @@ test('テスト2.職種：ラジオボタン', async t => {
   await t
     .setNativeDialogHandler(() => true)
     .click(userJob)//ラジオボタン
-    .click(submitButton);//submitボタンをクリックする
+    .expect(userJob.parent('label').child('span').innerText).eql("UIデザイナー")
+    //"UIデザイナー"が押されたか確認
+    .click(submitButton)
+    .expect(userJob.checked).ok();
 });
 
 
@@ -60,15 +64,19 @@ test('テスト2-B. id未参照ver', async t => {
 
 
 test('テスト3. スキル:チェックボックス', async t => {
-  const userJob   = await Selector('#send-form').child('fieldset').child('label').child('input[value="2"]').withAttribute('type','checkbox');
+  const userSkill1   = await Selector('#send-form').child('fieldset').child('label').child('input[value="1"]').withAttribute('type','checkbox');
+  const userSkill2   = await Selector('#send-form').child('fieldset').child('label').child('input[value="2"]').withAttribute('type','checkbox');
+  const userSkill3   = await Selector('#send-form').child('fieldset').child('label').child('input[value="3"]').withAttribute('type','checkbox');
   const submitButton = await Selector('#submit-button');
   await t
     .setNativeDialogHandler(() => true)
-    .click(userJob)
-    .click(Selector('#send-form').child('fieldset').child('label').child('input[value="3"]').withAttribute('type','checkbox'))
-    //.wait(2000)
-    .click(submitButton);
-  await t.expect(userJob.checked).ok();
+    .click(userSkill2)
+    .click(userSkill3)
+    .click(submitButton)
+    //2と3のみがチェックされてるか確認(ゴリ押しで網羅)
+    .expect(userSkill2.checked).ok()
+    .expect(userSkill3.checked).ok()
+    .expect(userSkill1.checked).notOk();
 });
 
 
@@ -121,14 +129,13 @@ test('テスト6. 複合テスト', async t => {
     .click(citySelect)//選びなおし
     .click(cityOption.withAttribute("value","3"))
     .typeText(note, '複合テスト')//文字入力
-    //.wait(2000)
-    .click(submitButton);
+    .click(submitButton);//決定ボタン（遷移はしない）
   await t.expect(note.value)
     .contains('複合', '[複合]文字が含まれてない.');//右はエラーメッセージ
 });
 
 
-test('テスト7.画面遷移', async t => {
+test('テスト7.画面遷移のURLチェック', async t => {
   const userName   = await Selector('#user-name');
   const submitButton = await Selector('#submit-button');
   const moveButton = await Selector("#page-move").child('input').withAttribute("type","button");
@@ -147,11 +154,14 @@ test('テスト8.ダイアログ(true/false)', async t => {
   const userName   = await Selector('#user-name');
   const submitButton = await Selector('#submit-button');
   await t
-    .setNativeDialogHandler(() => false)
+    .setNativeDialogHandler(() => false)//ダイアログ＝キャンセル
     .typeText(userName, '1回目!')
     .click(submitButton)
     .setNativeDialogHandler(() => true)
     .typeText(userName, '2回目!')
     .click(submitButton)
     .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/1-thanks.html") 
+    const history = await t.getNativeDialogHistory();
+    await t.expect(history[0].text).eql("この内容で送信します。よろしいですか？");
+    //ダイアログの文字が正しいかを確認
 });
