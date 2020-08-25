@@ -1,5 +1,5 @@
-//https://app.codegrid.net/entry/2017-testcafe-1#toc-1 
-// testcafeの動作確認　浮田誉之
+//参考 https://app.codegrid.net/entry/2017-testcafe-1#toc-1 
+//testcafeの練習　浮田誉之
 //8/25
 
 import {Selector} from 'testcafe';
@@ -18,7 +18,7 @@ test('テスト1.名前を入力後、送信して遷移先を確認', async t =
   //ボタンを押した後に想定される文章がeqlと一致 
   .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/1-thanks.html");
     //画面遷移のURL確認
-});//ここまでが1つのテスト（必要項目を入力後、送信して遷移先を確認）
+});//ここまでが1つのテスト
 
 
 test('テスト1-B.名前が未入力の場合', async t => {
@@ -26,10 +26,13 @@ test('テスト1-B.名前が未入力の場合', async t => {
   const submitButton = await Selector('#submit-button');
   await t
     .setNativeDialogHandler(() => true)
-    //.typeText(userName, '')
-    .click(submitButton);
-  await t.expect(Selector('#user-name-error').innerText).eql('名前は必須項目です。')
-   .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/");
+    .expect(Selector('#user-name-error').innerText).eql('名前は必須項目です。')
+    .expect(Selector('#user-name-error').exists).notOk()
+    .wait(1000)
+    .click(submitButton)//ボタンを押す（名前は未入力）
+    .expect(Selector('#user-name-error').innerText).eql('名前は必須項目です。')
+    .expect(Selector('#user-name-error').exists).ok()
+    .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/");
     //赤文字で「名前は必須項目です。」が表示されてるか調べたい
 });
 
@@ -122,4 +125,33 @@ test('テスト6. 複合テスト', async t => {
     .click(submitButton);
   await t.expect(note.value)
     .contains('複合', '[複合]文字が含まれてない.');//右はエラーメッセージ
+});
+
+
+test('テスト7.画面遷移', async t => {
+  const userName   = await Selector('#user-name');
+  const submitButton = await Selector('#submit-button');
+  const moveButton = await Selector("#page-move").child('input').withAttribute("type","button");
+  await t
+    .setNativeDialogHandler(() => true)
+    .typeText(userName, 'うきた')
+    .click(submitButton)
+    .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/1-thanks.html")
+    .click(moveButton)//"戻る"ボタンをクリック
+    .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/");
+ 
+});
+
+
+test('テスト8.ダイアログ(true/false)', async t => {
+  const userName   = await Selector('#user-name');
+  const submitButton = await Selector('#submit-button');
+  await t
+    .setNativeDialogHandler(() => false)
+    .typeText(userName, '1回目!')
+    .click(submitButton)
+    .setNativeDialogHandler(() => true)
+    .typeText(userName, '2回目!')
+    .click(submitButton)
+    .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/1-thanks.html") 
 });
