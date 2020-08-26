@@ -7,7 +7,8 @@ import {Selector} from 'testcafe';
 fixture('アンケートフォームのテスト')
   .page('http://127.0.0.1:5500/');//LiveServer
 
-test('テスト1.名前を入力後、送信して遷移先を確認', async t => {
+
+test('テスト1.名前を入力後、送信して遷移先を確認', async (t:TestController) => {
   const userName   = await Selector('#user-name');//#user-name=名前欄のID
   const submitButton = await Selector('#submit-button');
   await t
@@ -93,36 +94,36 @@ test('テスト4.住所ドロップダウンリスト', async t => {
   //value=3のボタンが押される → #cityのvalueが3であることを確認
 });
 
-/* //動かない
-test('テスト5. 満足度:目盛り', async t => {
-  const memori   = await Selector('input[type="range"]');
-  //const memoriOption = await memori.find("option").withAttribute("label","100%");
-  await t
-    .setNativeDialogHandler(() => true)
-    .click(memori)
-    .drag(memori, 50, 0, {
-      //offsetX: 10,
-      //offsetY: 10,
-      modifiers: {
-        //shift: true//マウス操作中にshiftキーを押す
-      }
-  })
-    .wait(2000)
-    //.click(memori);
-    await t.expect(memori.value).eql("100");
-});*/
+//動かない
+// test('テスト5. 満足度:目盛り', async t => {
+//   const memori   = await Selector('input[type="range"]');
+//   //const memoriOption = await memori.find("option").withAttribute("label","100%");
+//   await t
+//     .setNativeDialogHandler(() => true)
+//     .click(memori)
+//     .drag(memori, 50, 0, {
+//       //offsetX: 10,
+//       //offsetY: 10,
+//       modifiers: {
+//         //shift: true//マウス操作中にshiftキーを押す
+//       }
+//   })
+//     .wait(2000)
+//     //.click(memori);
+//     await t.expect(memori.value).eql("100");
+// });
 
 test('テスト6. 複合テスト', async t => {
   const userName   = await Selector('#user-name');
-  const userJob   = await Selector('#user-job3');
+  const userJob = await Selector('#user-job3');
   const checker   = await Selector('#send-form').child('fieldset').child('label').child('input[value="3"]').withAttribute('type','checkbox');
   const citySelect  = await Selector('#city');
   const cityOption  = await citySelect.find('option');
-  const note = await Selector("#note");
+  const note = await Selector('#note');
   const submitButton = await Selector('#submit-button');
   await t
     .setNativeDialogHandler(() => true)
-    .click(userJob)//ラジオボタン
+    .click(userJob) // ラジオボタン
     .click(checker)//チェックボックス
     .click(citySelect)//ダウンメニュー
     .click(cityOption.withText('関東周辺'))
@@ -157,7 +158,7 @@ test('テスト8.ダイアログ(true/false)', async t => {
     .setNativeDialogHandler(() => false)//ダイアログ＝キャンセル
     .typeText(userName, '1回目!')
     .click(submitButton)
-    .setNativeDialogHandler(() => true)
+    .setNativeDialogHandler(() => true)//ダイアログ＝OK
     .typeText(userName, '2回目!')
     .click(submitButton)
     .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/1-thanks.html") 
