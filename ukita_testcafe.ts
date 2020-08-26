@@ -152,7 +152,7 @@ test('テスト7.画面遷移のURLチェック', async t => {
 
 
 test('テスト8.ダイアログ(true/false)', async t => {
-  const userName   = await Selector('#user-name');
+  const userName  = await Selector('#user-name');
   const submitButton = await Selector('#submit-button');
   await t
     .setNativeDialogHandler(() => false)//ダイアログ＝キャンセル
