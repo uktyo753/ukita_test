@@ -6,7 +6,7 @@ import {Selector} from 'testcafe';
 import {Role} from 'testcafe';
 import * as retry from "./retry_test";
 
-fixture('アンケートフォームのテスト')
+fixture('アンケートフォームのテスト/')
   .page('http://127.0.0.1:5500/1-thanks.html');//LiveServer
 
 let testItem:any//reTryに渡す用
