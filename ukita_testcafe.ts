@@ -7,7 +7,7 @@ import {Role} from 'testcafe';
 import * as retry from "./retry_test";
 
 fixture('アンケートフォームのテスト/')
-  .page('http://127.0.0.1:5500/1-thanks.html');//LiveServer
+  .page('http://127.0.0.1:5500/');//LiveServer
 
 let testItem:any//reTryに渡す用
 
@@ -150,7 +150,7 @@ test('テスト6. 複合テスト', async t => {
 
 
 test('テスト7.画面遷移のURLチェック', async t => {
-  testItem = async (tc: TestController) => {
+  //testItem = async (tc: TestController) => {
     const userName   = await Selector('#user-name');
     const submitButton = await Selector('#submit-button');
     const moveButton = await Selector("#page-move").child('input').withAttribute("type","button");
@@ -161,13 +161,13 @@ test('テスト7.画面遷移のURLチェック', async t => {
       .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/1-thanks.html")
       .click(moveButton)//"戻る"ボタンをクリック
       .expect(t.eval(() => document.location.href)).eql("http://12a7.0.0.1:5500/");
-    }
-  await retry.reTry(testItem, t);//リトライ
+    //}
+  //await retry.reTry(testItem, t);//リトライ
 });
 
 
 test('テスト8.ダイアログ(true/false)', async t => {
-  testItem = async (tc: TestController) => {
+  //testItem = async (tc: TestController) => {
     const userName  = await Selector('#user-name');
     const submitButton = await Selector('#submit-button');
     await t
@@ -181,8 +181,8 @@ test('テスト8.ダイアログ(true/false)', async t => {
       const history = await t.getNativeDialogHistory();//ダイアログ履歴から文字列を取得
       await t.expect(history[0].text).eql("この内容で送信します。よろしいですか？");
       //ダイアログの文字が正しいかを確認
-    }
-    await retry.reTry(testItem, t);//リトライ
+   // }
+    //await retry.reTry(testItem, t);//リトライ
 });
 
 
