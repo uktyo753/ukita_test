@@ -1,5 +1,5 @@
 //TestcafeのreTryモジュール 
-// 8/27
+// 8/31
 // -q オプションでも可（3回実行）
 const MAX_RETRY_COUNT = 3; //試行数
 
