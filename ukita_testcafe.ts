@@ -75,19 +75,24 @@ test('テスト2-B. id未参照ver', async t => {
 
 
 test('テスト3. スキル:チェックボックス', async t => {
-  const userSkill1   = await Selector('#send-form').child('fieldset').child('label').child('input[value="1"]').withAttribute('type','checkbox');
-  const userSkill2   = await Selector('#send-form').child('fieldset').child('label').child('input[value="2"]').withAttribute('type','checkbox');
-  const userSkill3   = await Selector('#send-form').child('fieldset').child('label').child('input[value="3"]').withAttribute('type','checkbox');
-  const submitButton = await Selector('#submit-button');
-  await t
-    .setNativeDialogHandler(() => true)
-    .click(userSkill2)
-    .click(userSkill3)
-    .click(submitButton)
-    //2と3のみがチェックされてるか確認
-    .expect(userSkill2.checked).ok()
-    .expect(userSkill3.checked).ok()
-    .expect(userSkill1.checked).notOk();
+  testItem = async (tc: TestController) => { 
+    const userSkill1   = await Selector('#send-form').child('fieldset').child('label').child('input[value="1"]').withAttribute('type','checkbox');
+    const userSkill2   = await Selector('#send-form').child('fieldset').child('label').child('input[value="2"]').withAttribute('type','checkbox');
+    const userSkill3   = await Selector('#send-form').child('fieldset').child('label').child('input[value="3"]').withAttribute('type','checkbox');
+    const submitButton = await Selector('#submit-button');
+    await t
+      .setNativeDialogHandler(() => true)
+      .click(userSkill2)
+      .click(userSkill3)
+      .click(submitButton);
+      //2と3のみがチェックされてるか確認
+     await t 
+      .wait(1000)
+      .expect(userSkill1.checked).notOk()
+      .expect(userSkill2.checked).notOk()
+      .expect(userSkill3.checked).notOk();
+  }
+  await retry.reTry(testItem, t);//リトライ
 });
 
 
@@ -143,14 +148,14 @@ test('テスト6. 複合テスト', async t => {
       .typeText(note, '複合テスト')//文字入力
       .click(submitButton);//決定ボタン（遷移はしない）
     await t.expect(note.value)
-      .contains('複合', '[複合]文字が含まれてない.');//右はエラー時のメッセージ?
+      .contains('複合', '文字が含まれてない.');//右はエラー時のメッセージ?
   }
   await retry.reTry(testItem, t);//リトライ
 });
 
 
 test('テスト7.画面遷移のURLチェック', async t => {
-  //testItem = async (tc: TestController) => {
+  testItem = async (tc: TestController) => {
     const userName   = await Selector('#user-name');
     const submitButton = await Selector('#submit-button');
     const moveButton = await Selector("#page-move").child('input').withAttribute("type","button");
@@ -161,8 +166,8 @@ test('テスト7.画面遷移のURLチェック', async t => {
       .expect(t.eval(() => document.location.href)).eql("http://127.0.0.1:5500/1-thanks.html")
       .click(moveButton)//"戻る"ボタンをクリック
       .expect(t.eval(() => document.location.href)).eql("http://12a7.0.0.1:5500/");
-    //}
-  //await retry.reTry(testItem, t);//リトライ
+   }
+  await retry.reTry(testItem, t);//リトライ
 });
 
 
