@@ -13,8 +13,7 @@ let i:number = 1;
 let testItem:any;
 
 test('ドロップダウンリスト', async t => {
-    testItem = async (tc: TestController) => {
-     //  test('内部テスト', async t => { //testの中にtestはムリ
+   // testItem = async (tc: TestController) => {
     //console.log(i+"回目");
     const citySelect  = await Selector('#city');
     const cityOption  = await citySelect.find('option');
@@ -29,14 +28,19 @@ test('ドロップダウンリスト', async t => {
 
     //if(i%2==0){x="334";} //正解
     //{x="1"} //不正解
-     if(i==1){x="99"; }
-     if(i==2){x="3";} //"3"は正解
-     if(i==3){x="100";y="う";} //"う"は正解
-     if(i==4){x="3";}
+     if(i==1){x="99"; }//原因１
+     if(i==2){x="3";} //原因2
+     if(i==3){x="100";y="あいうえお";} //原因1
+     if(i==4){x="3";}//正解
      if(i==5){x="101";}
     i++;
+   try{
   await t.expect(citySelect.value).eql(x) //x==”3”なら成功
-  .expect(note.value).contains('う', 'contain失敗！.');
-   }
-   await retry.reTry(testItem, t); //リトライ
+  .expect(note.value).eql(y);
+     }catch(err){
+        console.log((i-1)+"回目エラー..."+err.errMsg);//エラー文表示
+        throw err
+     }
+//}
+   //await retry.reTry(testItem, t); //リトライ
 });
